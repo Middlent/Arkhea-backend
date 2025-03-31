@@ -65,7 +65,7 @@ async function sub_produto(cod, quantidade){
     await client.release()
 }
 
-// TODO Registrar venda
+// Registrar venda
 
 async function registrar_venda(produtos, valorPago){
     const client = await connect()
