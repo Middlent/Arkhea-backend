@@ -20,7 +20,7 @@ async function ler_produto(){
     const client = await connect()
     const produtos = await client.query("SELECT * FROM \"Produto\" WHERE \"ativo\" = true")
     await client.release()
-    return produtos
+    return produtos.rows
 }
 
 async function editar_produto(cod, novo_produto){
