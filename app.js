@@ -21,15 +21,23 @@ app.post("/criarProduto",(req, res) => {
 })
 
 app.get("/lerProduto",(req, res) => {
+    console.log("Listando produtos")
     connection.ler_produto().then((result) => {
+        console.log("Resultado " + JSON.stringify(result))
         res.send(result)
     })
 })
 
 // Body esperado {cod: int} ou {nome: string}
 app.post("/buscarProduto",(req, res) => {
+    console.log("Buscando produtos")
     connection.buscar_produto(req.body).then((result) => {
-        res.status(200).send(result)
+        console.log("Resultado " + JSON.stringify(result))
+        if(result !== undefined){
+            res.status(200).send(result)
+        }else{
+            res.status(204).send()
+        }
     })
 })
 
