@@ -26,6 +26,13 @@ app.get("/lerProduto",(req, res) => {
     })
 })
 
+// Body esperado {cod: int} ou {nome: string}
+app.post("/buscarProduto",(req, res) => {
+    connection.buscar_produto(req.body).then((result) => {
+        res.status(200).send(result)
+    })
+})
+
 // Body esperado {cod: int, produto: {...}} 
 // (... sendo quaisquer combinação de 
 // nome, preco ou quantidade do produto novo)

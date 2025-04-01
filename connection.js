@@ -23,6 +23,14 @@ async function ler_produto(){
     return produtos.rows
 }
 
+async function buscar_produto(busca){
+    const client = await connect()
+    const produtos = await client.query("SELECT * FROM \"Produto\" "+
+        "WHERE \"ativo\" = true AND " + (busca.cod? "\"cod\" = "+busca.cod : "\"nome\" = '"+busca.nome+"'"))
+    await client.release()
+    return produtos.rows[0]
+}
+
 async function editar_produto(cod, novo_produto){
     let alterations = ""
     if(novo_produto.nome){
@@ -85,6 +93,7 @@ async function registrar_venda(produtos, valorPago){
 
 exports.criar_produto = criar_produto
 exports.ler_produto = ler_produto
+exports.buscar_produto = buscar_produto
 exports.editar_produto = editar_produto
 exports.deletar_produto = deletar_produto
 
