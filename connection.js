@@ -23,10 +23,10 @@ async function ler_produto(){
     return produtos.rows
 }
 
-async function buscar_produto(busca){
+async function buscar_produto(busca, creating = false){
     const client = await connect()
     const produtos = await client.query("SELECT * FROM \"Produto\" "+
-        "WHERE \"ativo\" = true AND " + (busca.cod? "\"cod\" = "+busca.cod : "\"nome\" = '"+busca.nome+"'"))
+        "WHERE "+(creating? "" : "\"ativo\" = true AND ") + (busca.cod? "\"cod\" = "+busca.cod : "\"nome\" = '"+busca.nome+"'"))
     await client.release()
     return produtos.rows[0]
 }
@@ -47,6 +47,12 @@ async function editar_produto(cod, novo_produto){
             alterations += " , "
         }
         alterations += "\"quantidade\" = "+novo_produto.quantidade
+    }
+    if(novo_produto.ativo){
+        if(alterations != ""){
+            alterations += " , "
+        }
+        alterations += "\"ativo\" = "+novo_produto.ativo
     }
     const client = await connect()
     await client.query("UPDATE \"Produto\" SET "+alterations+" WHERE \"cod\" = "+cod)

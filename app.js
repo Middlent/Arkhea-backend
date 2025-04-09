@@ -14,9 +14,23 @@ app.use(express.json())
 
 // Body esperado {cod: int, nome: string, preco: float, quantidade: float}
 app.post("/criarProduto",(req, res) => {
-    console.log("Criando produto: "+JSON.stringify(req.body))
-    connection.criar_produto(req.body).then(() => {
-        res.status(200).send()
+    console.log("Buscando produto: "+JSON.stringify(req.body))
+    connection.buscar_produto({cod: req.body.cod}, true).then((produto) => {
+        if(produto === undefined){
+            console.log("Criando produto: "+JSON.stringify(req.body))
+            connection.criar_produto(req.body).then(() => {
+                res.status(201).send()
+            })
+        }else if(!produto.ativo){
+            console.log("Produto encontrado, substituindo: "+JSON.stringify(req.body))
+            const newBody = req.body
+            newBody.ativo = true
+            connection.editar_produto(req.body.cod, newBody).then(() => {
+                res.status(201).send()
+            })
+        }else{
+            res.status(409).send()
+        }
     })
 })
 
@@ -24,19 +38,19 @@ app.get("/lerProduto",(req, res) => {
     console.log("Listando produtos")
     connection.ler_produto().then((result) => {
         console.log("Resultado " + JSON.stringify(result))
-        res.send(result)
+        res.status(200).send(result)
     })
 })
 
 // Body esperado {cod: int} ou {nome: string}
 app.post("/buscarProduto",(req, res) => {
-    console.log("Buscando produtos")
+    console.log("Buscando produto: "+JSON.stringify(req.body))
     connection.buscar_produto(req.body).then((result) => {
         console.log("Resultado " + JSON.stringify(result))
         if(result !== undefined){
             res.status(200).send(result)
         }else{
-            res.status(204).send()
+            res.status(404).send()
         }
     })
 })
@@ -47,7 +61,7 @@ app.post("/buscarProduto",(req, res) => {
 app.post("/editarProduto",(req, res) => {
     console.log("Editando produto: "+JSON.stringify(req.body))
     connection.editar_produto(req.body.cod, req.body.produto).then(() => {
-        res.status(200).send()
+        res.status(201).send()
     })
 })
 
@@ -55,7 +69,7 @@ app.post("/editarProduto",(req, res) => {
 app.post("/deletarProduto",(req, res) => {
     console.log("Deletando produto: "+JSON.stringify(req.body))
     connection.deletar_produto(req.body.cod).then(() => {
-        res.status(200).send()
+        res.status(201).send()
     })
 })
 
@@ -63,7 +77,7 @@ app.post("/deletarProduto",(req, res) => {
 app.post("/addProduto",(req, res) => {
     console.log("Adicionando ao produto: "+JSON.stringify(req.body))
     connection.add_produto(req.body.cod, req.body.quantidade).then(() => {
-        res.status(200).send()
+        res.status(201).send()
     })
 })
 
@@ -71,7 +85,7 @@ app.post("/addProduto",(req, res) => {
 app.post("/subProduto",(req, res) => {
     console.log("Subtraindo ao produto: "+JSON.stringify(req.body))
     connection.sub_produto(req.body.cod, req.body.quantidade).then(() => {
-        res.status(200).send()
+        res.status(201).send()
     })
 })
 
@@ -89,7 +103,7 @@ app.post("/registrarVenda",(req, res) => {
         })        
     }
     connection.registrar_venda(produtosFinal,req.body.valorPago).then(() => {
-        res.status(200).send()
+        res.status(201).send()
     })
 })
 
